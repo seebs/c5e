@@ -1,0 +1,86 @@
+body {
+    background-color:  #ffffff;
+    color: #202020;
+    font-family: "Libra Baskerville", Baskerville, serif;
+    text-align: left;
+}
+
+p {
+  margin-bottom: 0.1em;
+  margin-top: 0.1em;
+}
+
+h2, h3, h4 {
+  font-variant: small-caps;
+  font-weight: normal;
+}
+
+h2 {
+  color: #600;
+  margin-bottom: 0.1em;
+}
+
+h3 {
+  color: #600;
+  border-bottom: 1px solid;
+  margin-bottom: 0.1em;
+}
+
+h4 {
+  color: #600;
+  margin-bottom: 0em;
+  margin-top: 0.5em;
+}
+
+ul, ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+a {
+    color: #0000a0;
+    text-decoration: none;
+}
+
+td.c {
+  text-align: center;
+}
+
+p.hang {
+  padding-left: 1em;
+  text-indent: -1em;
+  margin-bottom: 0em;
+  margin-top: 0em;
+}
+
+a:active {
+    color:  #0000ff;
+    text-decoration: underline;
+}
+
+a:visited {
+    color:  #500090;
+}
+
+table.classtable {
+  width: 100%;
+}
+
+th {
+  text-align: center;
+}
+
+a:hover {
+    color: #0000ff;
+    text-decoration: underline;
+}
+
+div.description {
+}
+
+div.illo {
+    float: right;
+    clear: right;
+    display: inline;
+    margin-left: .1em;
+}

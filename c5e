@@ -1,0 +1,55 @@
+#!/usr/bin/ruby -w
+
+require 'yaml'
+
+def note(message)
+  STDERR.puts message
+end
+
+class Sanity
+  def initialize(data)
+    @failed = false
+    @data = data
+    @filename = @data['filename'] or 'unknown file'
+    raise ArgumentError if check
+  end
+
+  def fatal(message)
+    note "Fatal error in '#{@filename}': #{message}"
+    @failed = true
+  end
+
+  def check
+    if !@data['name']
+      fatal "No name defined."
+    end
+    @failed
+  end
+end
+
+def prettyprint(data, filename)
+  data['filename'] = filename
+  begin
+    Sanity.new(data)
+  rescue ArgumentError
+    return
+  end
+  note "Found data for #{data['name']}"
+end
+
+ARGV.each do |arg|
+  if not File.exist?(arg)
+    if File.exist?("#{arg}.yaml")
+      arg = "#{arg}.yaml"
+    else
+      note "Can't open '#{arg}'."
+      next
+    end
+  end
+  data = YAML.load_file(arg)
+  if data then
+    prettyprint(data, arg)
+  else
+    note "Failed to load '#{arg}'."
+  end
+end
