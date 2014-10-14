@@ -1,0 +1,21 @@
+name: bodger
+hitdie: d8
+features:
+  - name: percussive maintenance
+    level: 1
+    description: >
+      Fancy descriptive text
+      goes here.
+  - name: concussive maintenance
+    level: 2
+    description: >
+      Fancy descriptive text
+      goes here.
+flavortext: >
+  The bodger is good at whacking things until they work.
+  
+  ### Field Maintenance
+
+  The bodger's specialty is getting it to work, now. It might not work again
+  tomorrow, it might not work as well as it used to, but when you need it
+  working within five minutes, the bodger is your best bet.

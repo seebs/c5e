@@ -11,7 +11,7 @@ Top-level: scalars to scalars, in general
 	hitdie: d8
 	abilityincreases: Ability increases (default 4/8/12/16)
 	casting: 1, 1/2, or 1/3 for full, half, or 1/3 casters.
-	  Otherwise spell it out by hand.
+	  Special cases spell out by hand, omit if no casting.
 	featurecolumns: Array of additional column names. e.g., [sneak attack]
 	  Default is just [features]
 	proficiency_{armor,weapons,tools,saves}: self-explanatory
@@ -22,7 +22,7 @@ Top-level: scalars to scalars, in general
 	  array of class features. each feature is
 	  [name, level, description]. Features will go in the [features] column.
 	  You don't need to list ability increases separately.
-	extra features:
+	extra_features:
 	  mapping from each of the additional column names to an array like the
 	  features array.
 	intro_flavor: Introductory flavortext.

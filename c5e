@@ -1,16 +1,229 @@
 #!/usr/bin/ruby -w
 
+# The actual pretty-printing page:
+base_template = <<'EOF'
+doctype html
+html
+  head
+    title = "#{name}"
+    style type="text/css" == css
+  body
+    .content
+      h2 The #{name.capitalize}
+      == markdown(flavortext)
+    table.classtable
+      tr
+        th Level
+	th =="Proficiency<br/>Bonus"
+	th Features
+      - for level in (1..20)
+        tr
+          td.c =level.ordinalize
+	  td.c ="+#{proficiency(level)}"
+	  td =features_by_level[level].join(", ")
+    .content
+      h2 Class Features
+      p As a #{name}, you gain the following class features.
+      h4 Hit Points
+      markdown:
+        **Hit Dice:** 1d#{hitdie} per #{name} level  
+        **Hit Points at 1st Level:** #{hitdie} + your Constitution modifier  
+        **Hit Points at Higher Levels:** 1d#{hitdie} (or #{hitdie_average} + your Constitution modifier per #{name} level after 1st
+      h4 Proficiencies
+      markdown:
+        **Armor:** #{proficiency_armor.capitalize}  
+        **Weapons:** #{proficiency_weapons.capitalize}  
+        **Tools:** #{proficiency_tools.capitalize}  
+	  
+	**Saving Throws:** #{proficiency_saves.capitalize}  
+	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map(&:capitalize).join(", ")}
+
+      h4 Equipment
+      p Sample stuff.
+EOF
+
 require 'yaml'
+require 'slim'
+require 'optparse'
+require 'ostruct'
+require 'redcarpet'
+require 'active_support/core_ext/integer/inflections'
+
+Slim::Engine.set_default_options pretty: true, sort_attrs: false, tabsize: 8
 
 def note(message)
   STDERR.puts message
 end
 
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: c5e [-c css] classname"
+  opts.on("-cMANDATORY", String, "select css file") do |v|
+    options[:css] = v
+  end
+end.parse!
+
+default_css_data = <<'EOF'
+body {
+    background-color: #ffffff;
+    color: #202020;
+    font-family: "Libra Baskerville", Baskerville, serif;
+    text-align: left;
+}
+
+p {
+  margin-bottom: 0.1em;
+  margin-top: 0.1em;
+}
+
+h2, h3, h4 {
+  font-variant: small-caps;
+  font-weight: normal;
+}
+
+h2 {
+  color: #600;
+  margin-bottom: 0.1em;
+}
+
+h3 {
+  color: #600;
+  border-bottom: 1px solid;
+  margin-bottom: 0.1em;
+}
+
+h4 {
+  color: #600;
+  margin-bottom: 0em;
+  margin-top: 0.5em;
+}
+
+ul, ol {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+a {
+    color: #0000a0;
+    text-decoration: none;
+}
+
+td.c {
+  text-align: center;
+}
+
+p.hang {
+  padding-left: 1em;
+  text-indent: -1em;
+  margin-bottom: 0em;
+  margin-top: 0em;
+}
+
+a:active {
+    color:  #0000ff;
+    text-decoration: underline;
+}
+
+a:visited {
+    color:  #500090;
+}
+
+table.classtable {
+  min-width: 50%;
+}
+
+th {
+  text-align: center;
+}
+
+a:hover {
+    color: #0000ff;
+    text-decoration: underline;
+}
+
+div.description {
+}
+
+div.illo {
+    float: right;
+    clear: right;
+    display: inline;
+    margin-left: .1em;
+}
+EOF
+
+slim_template = Slim::Template.new { base_template }
+
+if options[:css] then
+  default_css_data = begin
+    File.read(options[:css])
+  rescue Errno::ENOENT
+    begin
+      File.read(options[:css] + ".css")
+    rescue Errno::ENOENT
+      note "Couldn't find a css file named '#{options[:css]}'."
+      nil
+    end
+  else
+    note "Couldn't find a css file named '#{options[:css]}'."
+    nil
+  end
+end
+
+class Wrapper
+  def initialize(obj)
+    @internal = obj
+    @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
+  end
+
+  def proficiency(n)
+    ((n+7)/4).floor
+  end
+
+  def markdown(text)
+    @markdown.render(text)
+  end
+
+  def method_missing(m, *args, &block)
+    obj = nil
+    if m[-1] == '='
+      name=m[0..-2]
+      if name == '[]'
+        @internal[args[0]] = args[1]
+	return @internal[args[0]]
+      else
+        @internal[name] = args[0]
+	return args[0]
+      end
+    end
+    if m == :[] then
+      obj = @internal[args[0]]
+    elsif @internal[m] then
+      obj = @internal[m]
+    elsif @internal[m.to_s] then
+      obj = @internal[m.to_s]
+    end
+    # nest this behavior
+    if obj.respond_to? :keys
+      Wrapper.new(obj)
+    else
+      obj
+    end
+  end
+end
+
 class Sanity
+  def default(name, value)
+    if !@data.send(name)
+      @data.send(name + "=", value)
+    end
+  end
+
   def initialize(data)
     @failed = false
     @data = data
-    @filename = @data['filename'] or 'unknown file'
+    @filename = @data.filename or 'unknown file'
     raise ArgumentError if check
   end
 
@@ -19,22 +232,64 @@ class Sanity
     @failed = true
   end
 
+  def full_capitalize(str)
+    str.split.map(&:capitalize).join(' ')
+  end
+
   def check
-    if !@data['name']
+    if !@data.name
       fatal "No name defined."
     end
+    if !@data.abilityincreases
+      @data.abilityincreases = [ 4, 8, 12, 16, 19 ]
+    end
+    if !@data.hitdie
+      fatal "You must specify hit die type (for example, 8 or d8)."
+    else
+      @data.hitdie = @data.hitdie.sub('d', '').to_i
+      if !@data.hitdie or @data.hitdie <= 0
+        fatal "Hit die must be a positive number."
+      end
+      @data.hitdie_average = (@data.hitdie / 2).floor + 1
+    end
+    @data.features_by_level = Hash.new { |h,k| h[k] = [] }
+    @data.features_by_name = Hash.new
+    @data.features.each do |f|
+      name = full_capitalize(f['name'])
+      level = f['level'].to_i
+      @data.features_by_level[level] << name
+      @data.features_by_name[name] = f['description']
+    end
+    @data.abilityincreases.each do |level|
+      @data.features_by_level[level] << "Ability Score Improvement"
+    end
+    default('proficiency_skills', ["one", "basket-weaving", "exploding"])
+    default('proficiency_armor', 'none')
+    default('proficiency_weapons', 'none')
+    default('proficiency_tools', 'none')
+    default('proficiency_saves', 'none')
+    @data.proficiency_skills_choose = @data.proficiency_skills[0]
+    @data.proficiency_skills_list = @data.proficiency_skills[1..-1]
     @failed
   end
 end
 
-def prettyprint(data, filename)
+def prettyprint(data, template, filename)
   data['filename'] = filename
+  w = Wrapper.new(data)
   begin
-    Sanity.new(data)
+    Sanity.new(w)
   rescue ArgumentError
     return
   end
-  note "Found data for #{data['name']}"
+  note "Found data for #{w.name}"
+  htmlname = if filename['.yaml'] then
+    filename.sub('.yaml', '.html')
+  else
+    filename + '.html'
+  end
+  htmlfile = File.open(htmlname, "w")
+  htmlfile.puts(template.render(w))
 end
 
 ARGV.each do |arg|
@@ -48,7 +303,10 @@ ARGV.each do |arg|
   end
   data = YAML.load_file(arg)
   if data then
-    prettyprint(data, arg)
+    if not data['css']
+      data['css'] = default_css_data
+    end
+    prettyprint(data, slim_template, arg)
   else
     note "Failed to load '#{arg}'."
   end
