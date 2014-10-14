@@ -1,5 +1,6 @@
 name: bodger
 hitdie: d8
+abilityincreases: [3, 6, 9, 12, 15, 2, 4, 8]
 features:
   - name: percussive maintenance
     level: 1

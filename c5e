@@ -28,7 +28,7 @@ html
       markdown:
         **Hit Dice:** 1d#{hitdie} per #{name} level  
         **Hit Points at 1st Level:** #{hitdie} + your Constitution modifier  
-        **Hit Points at Higher Levels:** 1d#{hitdie} (or #{hitdie_average} + your Constitution modifier per #{name} level after 1st
+        **Hit Points at Higher Levels:** 1d#{hitdie} (or #{hitdie_average}) + your Constitution modifier per #{name} level after 1st
       h4 Proficiencies
       markdown:
         **Armor:** #{proficiency_armor.capitalize}  
@@ -40,29 +40,16 @@ html
 
       h4 Equipment
       p Sample stuff.
+
+      - for level in (1..20)
+        - for feature in features_by_level[level]
+	  - if !already_displayed[feature]
+	    - already_displayed[feature] = true
+	    h3 =feature
+	    markdown:
+	      #{features_by_name[feature]}
+	 
 EOF
-
-require 'yaml'
-require 'slim'
-require 'optparse'
-require 'ostruct'
-require 'redcarpet'
-require 'active_support/core_ext/integer/inflections'
-
-Slim::Engine.set_default_options pretty: true, sort_attrs: false, tabsize: 8
-
-def note(message)
-  STDERR.puts message
-end
-
-options = {}
-
-OptionParser.new do |opts|
-  opts.banner = "Usage: c5e [-c css] classname"
-  opts.on("-cMANDATORY", String, "select css file") do |v|
-    options[:css] = v
-  end
-end.parse!
 
 default_css_data = <<'EOF'
 body {
@@ -131,6 +118,23 @@ a:visited {
 
 table.classtable {
   min-width: 50%;
+  border-collapse: collapse;
+}
+
+table.classtable tr td, th {
+  border-color: inherit;
+  border-style: none solid;
+  margin: 2pt;
+}
+
+table.classtable tr:nth-child(even) {
+  background-color: #cccccc;
+  border-color: #cccccc;
+}
+
+table.classtable tr:nth-child(odd) {
+  background-color: #ffffff;
+  border-color: #ffffff;
 }
 
 th {
@@ -152,6 +156,27 @@ div.illo {
     margin-left: .1em;
 }
 EOF
+
+require 'yaml'
+require 'slim'
+require 'optparse'
+require 'redcarpet'
+require 'active_support/core_ext/integer/inflections'
+
+Slim::Engine.set_default_options pretty: true, sort_attrs: false, tabsize: 8
+
+def note(message)
+  STDERR.puts message
+end
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: c5e [-c css] classname"
+  opts.on("-cMANDATORY", String, "select css file") do |v|
+    options[:css] = v
+  end
+end.parse!
 
 slim_template = Slim::Template.new { base_template }
 
@@ -242,6 +267,8 @@ class Sanity
     end
     if !@data.abilityincreases
       @data.abilityincreases = [ 4, 8, 12, 16, 19 ]
+    else
+      @data.abilityincreases.sort!
     end
     if !@data.hitdie
       fatal "You must specify hit die type (for example, 8 or d8)."
@@ -263,6 +290,15 @@ class Sanity
     @data.abilityincreases.each do |level|
       @data.features_by_level[level] << "Ability Score Improvement"
     end
+    first = @data.abilityincreases[0]
+    last = @data.abilityincreases[-1]
+    rest = @data.abilityincreases[1..-2]
+    @data.features_by_name['Ability Score Improvement'] = <<EOF
+When you reach #{first.ordinalize} level, and again at
+#{rest.map(&:ordinalize).join(", ")}, and #{last.ordinalize} level,
+you can increase one ability score by 2, or two ability scores by 1,
+to a maximum of 20.
+EOF
     default('proficiency_skills', ["one", "basket-weaving", "exploding"])
     default('proficiency_armor', 'none')
     default('proficiency_weapons', 'none')
@@ -270,6 +306,7 @@ class Sanity
     default('proficiency_saves', 'none')
     @data.proficiency_skills_choose = @data.proficiency_skills[0]
     @data.proficiency_skills_list = @data.proficiency_skills[1..-1]
+    @data.already_displayed = Hash.new
     @failed
   end
 end

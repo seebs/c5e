@@ -20,11 +20,18 @@ Top-level: scalars to scalars, in general
 	  [(a) or (b)] list.
 	features:
 	  array of class features. each feature is
-	  [name, level, description]. Features will go in the [features] column.
+	  name:
+	  level:
+	  description:
+	  Features will go in the [features] column.
 	  You don't need to list ability increases separately.
+	  You can include #{levelth} in the description to get the ordinal of
+	  the level the feature is set to.
 	extra_features:
-	  mapping from each of the additional column names to an array like the
-	  features array.
+	  mapping from each of the additional column names to an array of entries
+	  per level.  These don't get listed under Class Features in general.
+	  For something like sneak attack, have a general features entry at 1st
+	  level, and then an extra_features column.
 	intro_flavor: Introductory flavortext.
 	creating_a: Flavortext for character creation
 	quick_build: [ability, ability, background]
