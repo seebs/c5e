@@ -12,8 +12,6 @@ Top-level: scalars to scalars, in general
 	abilityincreases: Ability increases (default 4/8/12/16)
 	casting: 1, 1/2, or 1/3 for full, half, or 1/3 casters.
 	  Special cases spell out by hand, omit if no casting.
-	featurecolumns: Array of additional column names. e.g., [sneak attack]
-	  Default is just [features]
 	proficiency_{armor,weapons,tools,saves}: self-explanatory
 	proficiency_skills: [N, list, of, skills], where N is the number to pick
 	equipment: [list of items]. If an item is itself a list, it is an
@@ -28,17 +26,18 @@ Top-level: scalars to scalars, in general
 	  You can include #{levelth} in the description to get the ordinal of
 	  the level the feature is set to.
 	extra_features:
-	  mapping from each of the additional column names to an array of entries
-	  per level.  These don't get listed under Class Features in general.
-	  For something like sneak attack, have a general features entry at 1st
-	  level, and then an extra_features column.
-	intro_flavor: Introductory flavortext.
+	  hash mapping column headings to arrays of (20) data points.
+	  These don't get listed under Class Features in general.
+	  For something like sneak attack, have a general features entry
+	  at 1st level, and then an extra_features column.
+	flavortext: Introductory flavortext.
 	creating_a: Flavortext for character creation
 	quick_build: [ability, ability, background]
-	archetype_names: [singular, plural] such as
-	  [monastic tradition, monastic traditions]
-	archetype_names: [name one, name two, etc]
-	archetypes: mapping from archetype names to sub-mappings:
-	  flavortext: description
-	  features: list of [name, description] features
-
+	archetypes:
+          hash, containing "singular", "plural",
+	  and then other names each of which maps to a sub-hash containing
+	  "flavortext" (what it sounds like) and "features", which is an array
+	  of features like the features list. You should also have an entry
+	  in "features" for picking your archetype. "singular" and "plural"
+	  is where you'd put things like "roguish archetype"/"roguish
+	  archetypes" or "monastic tradition"/"monastic traditions".

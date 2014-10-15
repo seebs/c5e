@@ -1,6 +1,5 @@
 name: bodger
 hitdie: d8
-abilityincreases: [3, 6, 9, 12, 15, 2, 4, 8]
 features:
   - name: percussive maintenance
     level: 1
@@ -12,8 +11,19 @@ features:
     description: >
       Fancy descriptive text
       goes here.
+creating_a: >
+  Your bodger shall be constructed from only the finest explosions and
+  spare rivets.
+quick_build: [dexterity, intelligence, tinker]
+equipment:
+  - item the first
+  - item the second
+  - [three, four]
+  -
+    - five
+    - six
 flavortext: >
-  The bodger is good at whacking things until they work.
+  The bodger is good at whacking things until they work. Possibly with a hammer.
   
   ### Field Maintenance
 

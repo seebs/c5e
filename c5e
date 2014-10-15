@@ -11,6 +11,15 @@ html
     .content
       h2 The #{name.capitalize}
       == markdown(flavortext)
+      h3 Creating a #{name.capitalize}
+      markdown:
+        #{creating_a}
+      h4 Quick Build
+      p To create a #{name}, put your best score in
+	#{quick_build[0].capitalize}, your second-best in
+	#{quick_build[1].capitalize}, and take the
+	#{quick_build[2].capitalize} background.
+
     table.classtable
       tr
         th Level
@@ -40,7 +49,10 @@ html
 
       h4 Equipment
       p Sample stuff.
-
+      ul
+        - for item in equipment
+          li == markdown(item)
+	   
       - for level in (1..20)
         - for feature in features_by_level[level]
 	  - if !already_displayed[feature]
@@ -196,10 +208,75 @@ if options[:css] then
   end
 end
 
-class Wrapper
-  def initialize(obj)
-    @internal = obj
+fields = %i(
+  version
+  name
+  hitdie
+  abilityincreases
+  casting
+  features
+  extra_features
+  proficiency_armor
+  proficiency_weapons
+  proficiency_skills
+  proficiency_saves
+  proficiency_tools
+  equipment
+  flavortext
+  creating_a
+  quick_build
+  archetypes
+  css
+)
+
+ClassSpec = Struct.new(*fields)
+
+class ClassSpec
+  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed)
+  @@internal_members.each do |m| attr_accessor m end
+  def initialize(filename, hash)
+    @filename = filename
     @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
+    missing = []
+    extra = []
+    members.each do |m|
+      obj = hash[m] || hash[m.to_s]
+      hash.delete(m)
+      hash.delete(m.to_s)
+      if obj then
+	if obj.respond_to? :keys then
+	  obj = OpenStruct.new(obj)
+	end
+        send("#{m}=", obj)
+      else
+        missing << m
+      end
+    end
+    @@internal_members.each do |m|
+      self.send("#{m}=", hash[m] || hash[m.to_s])
+      hash.delete(m)
+      hash.delete(m.to_s)
+    end
+    hash.each do |k,v|
+      extra << k
+    end
+    if !missing.empty?
+      note "Missing fields: #{missing.join(', ')}"
+    end
+    if !extra.empty?
+      note "Extra fields: #{extra.join(', ')}"
+    end
+  end
+
+  def fatal(message)
+    note "Fatal error in '#{@filename}': #{message}"
+    @failed = true
+  end
+
+  def set_default(name, value)
+    if !send(name)
+      send(name + "=", value)
+    end
   end
 
   def proficiency(n)
@@ -210,123 +287,81 @@ class Wrapper
     @markdown.render(text)
   end
 
-  def method_missing(m, *args, &block)
-    obj = nil
-    if m[-1] == '='
-      name=m[0..-2]
-      if name == '[]'
-        @internal[args[0]] = args[1]
-	return @internal[args[0]]
-      else
-        @internal[name] = args[0]
-	return args[0]
-      end
-    end
-    if m == :[] then
-      obj = @internal[args[0]]
-    elsif @internal[m] then
-      obj = @internal[m]
-    elsif @internal[m.to_s] then
-      obj = @internal[m.to_s]
-    end
-    # nest this behavior
-    if obj.respond_to? :keys
-      Wrapper.new(obj)
-    else
-      obj
-    end
-  end
-end
-
-class Sanity
-  def default(name, value)
-    if !@data.send(name)
-      @data.send(name + "=", value)
-    end
-  end
-
-  def initialize(data)
-    @failed = false
-    @data = data
-    @filename = @data.filename or 'unknown file'
-    raise ArgumentError if check
-  end
-
-  def fatal(message)
-    note "Fatal error in '#{@filename}': #{message}"
-    @failed = true
-  end
-
   def full_capitalize(str)
     str.split.map(&:capitalize).join(' ')
   end
 
-  def check
-    if !@data.name
+  def sanity
+    @failed = false
+    if !name
       fatal "No name defined."
     end
-    if !@data.abilityincreases
-      @data.abilityincreases = [ 4, 8, 12, 16, 19 ]
-    else
-      @data.abilityincreases.sort!
+    if !abilityincreases
+      self.abilityincreases = [ 4, 8, 12, 16, 19 ]
     end
-    if !@data.hitdie
+    abilityincreases.sort!
+    if !hitdie
       fatal "You must specify hit die type (for example, 8 or d8)."
     else
-      @data.hitdie = @data.hitdie.sub('d', '').to_i
-      if !@data.hitdie or @data.hitdie <= 0
+      self.hitdie = hitdie.sub('d', '').to_i
+      if !hitdie or hitdie <= 0
         fatal "Hit die must be a positive number."
       end
-      @data.hitdie_average = (@data.hitdie / 2).floor + 1
+      self.hitdie_average = (hitdie / 2).floor + 1
     end
-    @data.features_by_level = Hash.new { |h,k| h[k] = [] }
-    @data.features_by_name = Hash.new
-    @data.features.each do |f|
+    self.features_by_level = Hash.new { |h,k| h[k] = [] }
+    self.features_by_name = Hash.new
+    features.each do |f|
       name = full_capitalize(f['name'])
       level = f['level'].to_i
-      @data.features_by_level[level] << name
-      @data.features_by_name[name] = f['description']
+      features_by_level[level] << name
+      features_by_name[name] = f['description']
     end
-    @data.abilityincreases.each do |level|
-      @data.features_by_level[level] << "Ability Score Improvement"
+    abilityincreases.each do |level|
+      features_by_level[level] << "Ability Score Improvement"
     end
-    first = @data.abilityincreases[0]
-    last = @data.abilityincreases[-1]
-    rest = @data.abilityincreases[1..-2]
-    @data.features_by_name['Ability Score Improvement'] = <<EOF
+    first = abilityincreases[0]
+    last = abilityincreases[-1]
+    rest = abilityincreases[1..-2]
+    features_by_name['Ability Score Improvement'] = <<EOF
 When you reach #{first.ordinalize} level, and again at
 #{rest.map(&:ordinalize).join(", ")}, and #{last.ordinalize} level,
 you can increase one ability score by 2, or two ability scores by 1,
 to a maximum of 20.
 EOF
-    default('proficiency_skills', ["one", "basket-weaving", "exploding"])
-    default('proficiency_armor', 'none')
-    default('proficiency_weapons', 'none')
-    default('proficiency_tools', 'none')
-    default('proficiency_saves', 'none')
-    @data.proficiency_skills_choose = @data.proficiency_skills[0]
-    @data.proficiency_skills_list = @data.proficiency_skills[1..-1]
-    @data.already_displayed = Hash.new
-    @failed
+    set_default('proficiency_skills', ["one", "basket-weaving", "exploding"])
+    set_default('proficiency_armor', 'none')
+    set_default('proficiency_weapons', 'none')
+    set_default('proficiency_tools', 'none')
+    set_default('proficiency_saves', 'none')
+    self.proficiency_skills_choose = proficiency_skills[0]
+    self.proficiency_skills_list = proficiency_skills[1..-1]
+    self.already_displayed = Hash.new
+    equipment.each_index do |i|
+      obj = equipment[i]
+      if obj.respond_to? :each_index
+        newlist = []
+	obj.each_index do |j|
+	  o = obj[j]
+	  let = 'abcdefghijklmnop'[j]
+	  newlist << "*(#{let})* #{o}"
+	end
+	equipment[i] = newlist.join(", or ")
+      end
+    end
+    !@failed
   end
-end
 
-def prettyprint(data, template, filename)
-  data['filename'] = filename
-  w = Wrapper.new(data)
-  begin
-    Sanity.new(w)
-  rescue ArgumentError
-    return
+  def prettyprint(template)
+    note "Found data for #{name}"
+    htmlname = if @filename['.yaml'] then
+      @filename.sub('.yaml', '.html')
+    else
+      @filename + '.html'
+    end
+    @htmlfile = File.open(htmlname, "w")
+    @htmlfile.puts(template.render(self))
   end
-  note "Found data for #{w.name}"
-  htmlname = if filename['.yaml'] then
-    filename.sub('.yaml', '.html')
-  else
-    filename + '.html'
-  end
-  htmlfile = File.open(htmlname, "w")
-  htmlfile.puts(template.render(w))
 end
 
 ARGV.each do |arg|
@@ -343,7 +378,10 @@ ARGV.each do |arg|
     if not data['css']
       data['css'] = default_css_data
     end
-    prettyprint(data, slim_template, arg)
+    wrapped = ClassSpec.new(arg, data)
+    if wrapped.sanity
+      wrapped.prettyprint(slim_template)
+    end
   else
     note "Failed to load '#{arg}'."
   end
