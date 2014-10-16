@@ -1,0 +1,67 @@
+version: 0.1
+name: bodger
+hitdie: d8
+features:
+  - name: percussive maintenance
+    level: 1
+    description: >
+      Starting at #{ordinal} level, a bodger can whack things until
+      they start working. When making a melee attack on a construct, you
+      can choose to subtract your Dexterity modifier from your damage
+      instead of adding it. When you do so, if the damage total would
+      be negative, it acts as healing of the same magnitude. If your
+      weapon is magical, its damage bonus is suppressed when using this
+      power.
+  - name: concussive maintenance
+    level: 2
+    description: >
+      Fancy descriptive text
+      goes here.
+casting: half
+proficiency_armor: light armor
+proficiency_weapons: simple weapons
+proficiency_tools: wrench
+proficiency_saves: dexterity, intelligence
+proficiency_skills: [three, athletics, sleight of hand, arcana, deception, intimidation, investigation]
+creating_a: >
+  Your bodger shall be constructed from only the finest explosions and
+  spare rivets.
+quick_build: [dexterity, intelligence, tinker]
+equipment:
+  - item the first
+  - item the second
+  - [three, four]
+  -
+    - five
+    - six
+flavortext: >
+  The bodger is good at whacking things until they work. Possibly with a hammer.
+  
+  ### Field Maintenance
+
+  The bodger's specialty is getting it to work, now. It might not work again
+  tomorrow, it might not work as well as it used to, but when you need it
+  working within five minutes, the bodger is your best bet.
+archetype_meta:
+  singular: bodger school
+  plural: bodger schools
+  flavortext: >
+    While bodgers start out as undisciplined tinkers, with time they develop
+    a more philosophical approach to their work, resulting in adhering to one
+    of the bodger schools of thought about machine maintenance. The school is
+    selected at 3rd level.
+archetypes:
+  school of hard knocks:
+    flavortext: >
+      The school of hard knocks teaches that the key virtue of percussive
+      maintenance is to hit something hard enough that it starts working
+      immediately.
+    features:
+      - name: whack it harder
+        level: 3
+        description: >
+          At #{ordinal} level, an initiate of the school of hard knocks rerolls
+          any 1s on damage dice when using percussive maintenance.
+extra_features:
+  kitty: [1, 2, 3]
+  sad kitty: [-, -, -]

@@ -33,11 +33,13 @@ Top-level: scalars to scalars, in general
 	flavortext: Introductory flavortext.
 	creating_a: Flavortext for character creation
 	quick_build: [ability, ability, background]
-	archetypes:
-          hash, containing "singular", "plural",
-	  and then other names each of which maps to a sub-hash containing
+	archetype_meta:
+          hash, containing "singular", "plural", and "flavortext".  "singular"
+	  and "plural" is where you'd put things like "roguish
+	  archetype"/"roguish archetypes" or "monastic tradition"/"monastic
+	  traditions".
+        archetypes:
+	  hash of archetype names, each of which maps toa  sub-hash containing
 	  "flavortext" (what it sounds like) and "features", which is an array
 	  of features like the features list. You should also have an entry
-	  in "features" for picking your archetype. "singular" and "plural"
-	  is where you'd put things like "roguish archetype"/"roguish
-	  archetypes" or "monastic tradition"/"monastic traditions".
+	  in the main "features" list for picking your archetype.

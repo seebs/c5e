@@ -22,14 +22,24 @@ html
 
     table.classtable
       tr
+        th
+	th Proficiency
+	th 
+	== feature_headers(true)
+	== casting_headers(true)
+      tr
         th Level
-	th =="Proficiency<br/>Bonus"
+	th Bonus
 	th Features
+	== feature_headers(false)
+	== casting_headers(false)
       - for level in (1..20)
         tr
           td.c =level.ordinalize
 	  td.c ="+#{proficiency(level)}"
 	  td =features_by_level[level].join(", ")
+	  == feature_body(level - 1)
+	  == casting_body(level - 1)
     .content
       h2 Class Features
       p As a #{name}, you gain the following class features.
@@ -44,8 +54,8 @@ html
         **Weapons:** #{proficiency_weapons.capitalize}  
         **Tools:** #{proficiency_tools.capitalize}  
 	  
-	**Saving Throws:** #{proficiency_saves.capitalize}  
-	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map(&:capitalize).join(", ")}
+	**Saving Throws:** #{full_capitalize(proficiency_saves)}  
+	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map {|x| full_capitalize(x) }.join(", ")}
 
       h4 Equipment
       p Sample stuff.
@@ -61,6 +71,14 @@ html
 	    markdown:
 	      #{features_by_name[feature]}
 	 
+      h2 #{full_capitalize(archetype_meta.plural)}
+      == markdown(archetype_meta.flavortext)
+      - archetypes.each_pair do |name, details|
+        h3 =name
+	== markdown(details.flavortext)
+	- for feature in details.features
+	  h4 = feature.name
+	  p == markdown(feature.description)
 EOF
 
 default_css_data = <<'EOF'
@@ -136,15 +154,15 @@ table.classtable {
 table.classtable tr td, th {
   border-color: inherit;
   border-style: none solid;
-  margin: 2pt;
+  padding: 1pt 5pt;
 }
 
-table.classtable tr:nth-child(even) {
+table.classtable tr:nth-child(2n+1) {
   background-color: #cccccc;
   border-color: #cccccc;
 }
 
-table.classtable tr:nth-child(odd) {
+table.classtable tr:nth-child(1), tr:nth-child(2), tr:nth-child(2n) {
   background-color: #ffffff;
   border-color: #ffffff;
 }
@@ -172,6 +190,7 @@ EOF
 require 'yaml'
 require 'slim'
 require 'optparse'
+require 'ostruct'
 require 'redcarpet'
 require 'active_support/core_ext/integer/inflections'
 
@@ -225,31 +244,51 @@ fields = %i(
   flavortext
   creating_a
   quick_build
+  archetype_meta
   archetypes
   css
 )
 
 ClassSpec = Struct.new(*fields)
 
+def deepstruct(obj)
+  if obj.respond_to? :each_index
+    obj.each_index do |k|
+      v = obj[k]
+      if v.respond_to? :each then
+        obj[k] = deepstruct(v)
+      end
+    end
+  elsif obj.respond_to? :each_pair
+    obj.each_pair do |k,v|
+      if v.respond_to? :each then
+        obj[k] = deepstruct(v)
+      end
+    end
+    obj = OpenStruct.new(obj)
+  end
+  obj
+end
+
 class ClassSpec
-  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed)
+  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details)
   @@internal_members.each do |m| attr_accessor m end
+
   def initialize(filename, hash)
     @filename = filename
     @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
     missing = []
     extra = []
+    # convert everything to allow dots.
     members.each do |m|
       obj = hash[m] || hash[m.to_s]
       hash.delete(m)
       hash.delete(m.to_s)
       if obj then
-	if obj.respond_to? :keys then
-	  obj = OpenStruct.new(obj)
-	end
-        send("#{m}=", obj)
+        send("#{m}=", deepstruct(obj))
       else
-        missing << m
+	# Special case: We don't want to make you indicate the default.
+        missing << m unless m == :abilityincreases
       end
     end
     @@internal_members.each do |m|
@@ -291,6 +330,144 @@ class ClassSpec
     str.split.map(&:capitalize).join(' ')
   end
 
+  @@casting = {
+    nil => {
+      :max_level => 0,
+      :slots => []
+    },
+    "third" => {
+      :max_level => 4, 
+      :slots => [
+      [],
+      [],
+      [2],
+      [3],
+      [3],
+      [3],
+      [4, 2],
+      [4, 2],
+      [4, 2],
+      [4, 3],
+      [4, 3],
+      [4, 3],
+      [4, 3, 2],
+      [4, 3, 2],
+      [4, 3, 2],
+      [4, 3, 3],
+      [4, 3, 3],
+      [4, 3, 3],
+      [4, 3, 3, 1],
+      [4, 3, 3, 1],
+      ]
+    },
+    "half" => {
+      :max_level => 5, 
+      :slots => [
+      [],
+      [2],
+      [3],
+      [3],
+      [4, 2],
+      [4, 2],
+      [4, 3],
+      [4, 3],
+      [4, 3, 2],
+      [4, 3, 2],
+      [4, 3, 3],
+      [4, 3, 3],
+      [4, 3, 3, 1],
+      [4, 3, 3, 1],
+      [4, 3, 3, 2],
+      [4, 3, 3, 2],
+      [4, 3, 3, 3, 1],
+      [4, 3, 3, 3, 1],
+      [4, 3, 3, 3, 2],
+      [4, 3, 3, 3, 2],
+      ]
+    },
+    "full" => {
+      :max_level => 9, 
+      :slots => [
+      [2],
+      [3],
+      [4, 2],
+      [4, 3],
+      [4, 3, 2],
+      [4, 3, 3],
+      [4, 3, 3, 1],
+      [4, 3, 3, 2],
+      [4, 3, 3, 3, 1],
+      [4, 3, 3, 3, 2],
+      [4, 3, 3, 3, 2, 1],
+      [4, 3, 3, 3, 2, 1],
+      [4, 3, 3, 3, 2, 1, 1],
+      [4, 3, 3, 3, 2, 1, 1],
+      [4, 3, 3, 3, 2, 1, 1, 1],
+      [4, 3, 3, 3, 2, 1, 1, 1],
+      [4, 3, 3, 3, 2, 1, 1, 1, 1],
+      [4, 3, 3, 3, 2, 1, 1, 1, 1],
+      [4, 3, 3, 3, 2, 2, 1, 1, 1],
+      [4, 3, 3, 3, 2, 2, 2, 1, 1],
+      ]
+    },
+  }
+
+  def casting_headers(top)
+    max_level = @@casting[casting][:max_level]
+    if max_level > 0 then
+      if top then
+        return "<th colspan=#{max_level}>&mdash;Spell Slots per Spell Level&mdash;</th>\n"
+      else
+	(1..max_level).map do |l|
+	  "<th>#{l.ordinalize}</th>"
+	end.join("\n")
+      end
+    else
+      ""
+    end
+  end
+
+  def casting_body(level)
+    max_level = @@casting[casting][:max_level]
+    slots = @@casting[casting][:slots]
+    if max_level > 0 and slots[level] then
+      s = slots[level]
+      1.upto(max_level).map do |l|
+        if s[l] then
+	  "<td class='c'>#{s[l]}</td>"
+	else
+	  "<td class='c'>&mdash;</td>"
+	end
+      end.join("\n")
+    else
+      ""
+    end
+  end
+
+  def feature_headers(top)
+    if top then
+      index = 0
+    else
+      index = 1
+    end
+    extra_names.map do |name|
+      "<th>#{name[index]}</th>"
+    end.join("\n")
+  end
+
+  def feature_body(level)
+    extra_details.map do |d|
+      "<td class='c'>#{d[level] || "&mdash;"}</td>"
+    end.join("\n")
+  end
+
+  def feature_cleanup(f)
+    f.level = f.level.to_i
+    f.name = full_capitalize(f.name)
+    f.ordinal = f.level.ordinalize
+    f.description.gsub!('#{ordinal}', f.ordinal)
+  end
+
   def sanity
     @failed = false
     if !name
@@ -312,10 +489,9 @@ class ClassSpec
     self.features_by_level = Hash.new { |h,k| h[k] = [] }
     self.features_by_name = Hash.new
     features.each do |f|
-      name = full_capitalize(f['name'])
-      level = f['level'].to_i
-      features_by_level[level] << name
-      features_by_name[name] = f['description']
+      feature_cleanup(f)
+      features_by_level[f.level] << f.name
+      features_by_name[f.name] = f.description
     end
     abilityincreases.each do |level|
       features_by_level[level] << "Ability Score Improvement"
@@ -335,8 +511,34 @@ EOF
     set_default('proficiency_tools', 'none')
     set_default('proficiency_saves', 'none')
     self.proficiency_skills_choose = proficiency_skills[0]
-    self.proficiency_skills_list = proficiency_skills[1..-1]
+    self.proficiency_skills_list = proficiency_skills[1..-1].sort
     self.already_displayed = Hash.new
+    case casting
+    when "third", "full", "half";
+      # nothing to do here, otherwise we have to fix up the references
+    when "none", nil;
+      self.casting = nil
+    else
+      fatal "Unknown casting specifier #{casting}."
+      self.casting = nil
+    end
+    archetypes.each_pair do |name, a|
+      a.features.each do |f|
+        feature_cleanup(f)
+      end
+    end
+    self.extra_names = []
+    self.extra_details = []
+    extra_features.each_pair do |name, tab|
+      words = full_capitalize(name.to_s).split
+      # split into two lines
+      if words.count > 1 then
+        extra_names << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
+      else
+        extra_names << ["", words[0]]
+      end
+      extra_details << tab
+    end
     equipment.each_index do |i|
       obj = equipment[i]
       if obj.respond_to? :each_index
