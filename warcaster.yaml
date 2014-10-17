@@ -2,125 +2,131 @@ version: 0.1
 name: warcaster
 hitdie: d10
 features:
-  - name: Spellcasting
-    level: 1
-    description: >
-      At #{ordinal} level, choose either the bard, cleric, druid,
-      sorceror, or wizard spell list.  Your casting stat is the same as the class whose
-      spell list you are using.  You know two cantrips from that spell list.  You do not
-      need a spellbook, even if you are using wizard spells.  When you reach 2nd
-      level, you gain the ability to also cast spells that are not cantrips.  See chapter
-      10 for the general rules of spellcasting and chapter 11 for spell lists.
+- name: Spellcasting
+  level: 1
+  description: >
+    At #{ordinal} level, choose either the bard, cleric, druid,
+    sorceror, or wizard spell list.  Your casting stat is the same as the class whose
+    spell list you are using.  You know two cantrips from that spell list.  You do not
+    need a spellbook, even if you are using wizard spells.  When you reach 2nd
+    level, you gain the ability to also cast spells that are not cantrips.  See chapter
+    10 for the general rules of spellcasting and chapter 11 for spell lists.
 
-      #### Spell Slots
+    ####Spell Slots
 
-      The Warcaster table shows how many spell slots you have to cast your spells
-      of 1st level and higher.  To cast one of these spells, you must expend a slot of
-      the spell's level or higher.  You regain all expended spell slots when you
-      finish a long rest.
+    The Warcaster table shows how many spell slots you have to cast your spells
+    of 1st level and higher.  To cast one of these spells, you must expend a slot of
+    the spell's level or higher.  You regain all expended spell slots when you
+    finish a long rest.
 
-      #### Spells Known of 1st Level and Higher
+    ####Spells Known of 1st Level and Higher
 
-      At 2nd level, you know two 1st-level spells of your choice from your chosen
-      spell list.  
+    At 2nd level, you know two 1st-level spells of your choice from your chosen
+    spell list.    
 
-      The Spells Known column of the Warcaster table shows when you learn more
-      spells of your choice.  Each of these spells must be of a level for which you
-      have spell slots.  For instance, when you reach 5th level in this class, you can
-      learn one new spell of 1st or 2nd level.  
+    The Spells Known column of the Warcaster table shows when you learn more
+    spells of your choice.  Each of these spells must be of a level for which you
+    have spell slots.  For instance, when you reach 5th level in this class, you can
+    learn one new spell of 1st or 2nd level.    
 
-      Additionally, when you gain a level in this class, you can choose one of the
-      spells you know and replace it with another spell from your chosen spell list,
-      which must also be of a level for which you have spell slots.
-  - name: Fighting Style
-    level: 2
-    description: >
-      At #{ordinal} level, you adopt a particular style of fighting as your
-      speciality.  Choose one of the following options.  You can't take a Fighting Style
-      option more than once, even if you get to choose again later.
+    Additionally, when you gain a level in this class, you can choose one of the
+    spells you know and replace it with another spell from your chosen spell list,
+    which must also be of a level for which you have spell slots.
+- name: Fighting Style
+  level: 2
+  description: >
+    At #{ordinal} level, you adopt a particular style of fighting as your
+    speciality.  Choose one of the following options.  You can't take a Fighting Style
+    option more than once, even if you get to choose again later.
 
-      ####Defense
+    ####Defense
 
-      While you are wearing armor, you gain a +1 bonus to AC
+    While you are wearing armor, you gain a +1 bonus to AC
 
-      ####Dueling
+    ####Dueling
 
-      When you are wielding a melee weapon in one hand and no other melee
-      weapons, you gain a +2 bonus to damage rolls with that weapon.
+    When you are wielding a melee weapon in one hand and no other melee
+    weapons, you gain a +2 bonus to damage rolls with that weapon.
 
-      ####Great Weapon Fighting
+    ####Great Weapon Fighting
 
-      When you roll a 1 or 2 on a damage die for an attack you make with a melee
-      weapon that you are wielding in two hands, you can reroll the die and must
-      use the new roll, even if the new roll is a 1 or 2.  The weapon must have the
-      two-handed or versatile property for you to gain this benefit.
+    When you roll a 1 or 2 on a damage die for an attack you make with a melee
+    weapon that you are wielding in two hands, you can reroll the die and must
+    use the new roll, even if the new roll is a 1 or 2.  The weapon must have the
+    two-handed or versatile property for you to gain this benefit.
 
-      ####Gunnery
+    ####Gunnery
 
-      You gain a +2 bonus to attack rolls you make with ranged weapons.
+    You gain a +2 bonus to attack rolls you make with ranged weapons.
 
-      ####Two-Weapon Fighting
+    ####Two-Weapon Fighting
 
-      When you engage in two-weapon fighting, you can add your ability modifier
-      to the damage of the second attack.
-  - name: Sense Cortex
-    level: 3
-    description: >
-      Beginning at #{ordinal} level, you can sense 'jack cortices within 20 feet and
-      know whether or not they are active and whether or not they are currently
-      being marshalled or controlled by a warcaster.  By using your action, you can
-      expand this range to 100 feet for one round.
-  - name: Jack Commander
-    level: 3
-    description: >
-      At 3rd level, you gain a warjack that accompanies you on your adventures and
-      fights alongside you.  Work with your DM to select and stat out a light warjack.
-      Add your proficiency bonus to the 'jack's AC, attack rolls, and damage rolls.  A
-      'jack is extremely difficult to destroy completely, but if it suffers an amount of
-      damage greater than 20 + four times your warcaster level, arcane feedback
-      prevents you from controlling it until it has been repaired to within this limit
-      and you have used an action to re-establish your link.  
-      The 'jack obeys your commands as best it can.  It takes its turn on your
-      initiative, but does not take an action unless you command it to.  On your turn,
-      you can command the 'jack where to move without using an action.  You can
-      use your action to command it to take the Attack, Dash, Disengage, Dodge, or
-      Help action.  Once you have the Extra Attack feature, you can make one
-      weapon attack yourself when you command your 'jack to take the Attack action.
-  - name: Extra Attack
-    level: 5
-    description: >
-      Beginning at #{ordinal} level, you can attack twice, instead of once, whenever
-      you take the Attack action on your turn.
-  - name: Arcantrik Resilience
-    level: 6
-    description: >
-      Starting at #{ordinal} level, you can add your proficiency bonus to
-      concentration checks.
-  - name: TBD
-    level: 10
-    description: >
-      lorem ipsum sit amet dolor consectetur.  And I mean it.
-  - name: TBD
-    level: 14
-    description: >
-      lorem ipsum sit amet dolor consectetur.  No, really this time.
-  - name: Arcantrik Senses
-    level: 18
-    description: >
-      At 18th level, you gain preternatural senses that help you fight creatures
-      you can't see.  When you attack a creature you can't see, your inability
-      to see it does not impose disadvantage on your attack rolls against it.  
-      You are also aware of the location of any invisible creature within 30 feet
-      of you, provided that the creature isn't hidden from you and you aren't blinded
-      or deafened.
-  - name: Overdrive
-    level: 20
-    description: >
-      At 20th level, you can imbue your 'jack with a brief burst of energy.  Once on
-      each of your turns, you can add your casting stat modifier to the attack roll or
-      the damage roll of an attack made by a 'jack you are controlling.  You can
-      choose to use this feature before or after the roll, but before any effects of the
-      roll are applied.
+    When you engage in two-weapon fighting, you can add your ability modifier
+    to the damage of the second attack.
+- name: Sense Cortex
+  level: 3
+  description: >
+    Beginning at #{ordinal} level, you can sense 'jack cortices within 20 feet and
+    know whether or not they are active and whether or not they are currently
+    being marshalled or controlled by a warcaster.  By using your action, you can
+    expand this range to 100 feet for one round.
+- name: Jack Commander
+  level: 3
+  description: >
+    At 3rd level, you gain a warjack that accompanies you on your adventures and
+    fights alongside you.  Work with your DM to select and stat out a light warjack.
+    Add your proficiency bonus to the 'jack's attack rolls and damage rolls.  A
+    'jack is extremely difficult to destroy completely, but if it suffers an amount of
+    damage greater than 20 + four times your warcaster level, arcane feedback
+    prevents you from controlling it until it has been repaired to within this limit
+    and you have used an action to re-establish your link.    
+    The 'jack obeys your commands as best it can.  It takes its turn on your
+    initiative, but does not take an action unless you command it to.  On your turn,
+    you can command the 'jack where to move without using an action.  You can
+    use your action to command it to take the Attack, Dash, Disengage, Dodge, or
+    Help action.  Once you have the Extra Attack feature, you can make one
+    weapon attack yourself when you command your 'jack to take the Attack action.
+- name: Extra Attack
+  level: 5
+  description: >
+    Beginning at #{ordinal} level, you can attack twice, instead of once, whenever
+    you take the Attack action on your turn.
+- name: Arcantrik Resilience
+  level: 6
+  description: >
+    Starting at #{ordinal} level, you can add your proficiency bonus to
+    concentration checks.
+- name: Power Field
+  level: 10
+  description: >
+    Starting at #{ordinal} level, if you do not cast a spell or have a 'jack use the
+    Attack action during your turn, you receive a +2 bonus to AC until the beginning of
+    your next turn.  If you are wearing warcaster armor, it is instead increased by the
+    level of your highest unused spell slot (minimum 2).
+- name: Reinforced Power Field
+  level: 14
+  description: >
+    Beginning at #{ordinal} level, your Power Field can activate even if you do order a
+    'jack to use the Attack action.  In addition, if you are wearing warcaster armor,
+    whenever your Power Field activates, you also gain  temporary hit points equal to
+    the AC increase until the beginning of your next turn.
+- name: Arcantrik Senses
+  level: 18
+  description: >
+    At #{ordinal} level, you gain preternatural senses that help you fight creatures
+    you can't see.  When you attack a creature you can't see, your inability
+    to see it does not impose disadvantage on your attack rolls against it.  
+    You are also aware of the location of any invisible creature within 30 feet
+    of you, provided that the creature isn't hidden from you and you aren't blinded
+    or deafened.
+- name: Overdrive
+  level: 20
+  description: >
+    At #{ordinal} level, you can imbue your 'jack with a brief burst of energy.  Once on
+    each of your turns, you can add your casting stat modifier to the attack roll or
+    the damage roll of an attack made by a 'jack you are controlling.  You can
+    choose to use this feature before or after the roll, but before any effects of the
+    roll are applied.
 casting: half
 extra_features_after:
   Spells Known: [-, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11]
@@ -139,13 +145,37 @@ equipment:
   - light pistol and 20 rounds
   - dungeoneer's pack or explorer's pack
 flavortext: >
-  Stompy steampowered robots are here to save you from the terrible secret
-  of space.  Do not trust the pusher warcaster; her 'jack is malfunctioning.
+  A black-haired man in crimson armor strides forward, a blade in each hand, as a warjack
+  lays down mortar shells to cover his advance.  
+
+  A masked woman in the white robes of a cleric of Menoth carefully coordinates a pair
+  of warjacks to strike together, throwing the enemy line into confusion.  
+
+  A woman in the blue, white, and gold of the Swan stands well behind her soldiers,
+  directing their fire and keeping them safe with her spells as a light warjack runs forward
+  to channel her destructive powers far into the enemy ranks.  
+
+  Warcasters are a rare type of caster, but they have slowly become more common.  In
+  some few people, magical ability also brings the ability to mentally connect to the cortex
+  of a steamjack and control it almost as an extension of the caster's body.  The Iron
+  Kingdoms have hurried to militarize this talent, and those who have it quickly find
+  themselves caught up in the various bloody conflicts raging across western Immoren.
+
+  ###Steel, Steam, and Spells
+  Stuff about warcasters' in-game roles goes here.
+
+  ###Born to Battle
+  Stuff about how warcasters fit into society goes here.
+
 archetype_meta:
   singular: warcaster specialization
   plural: warcaster specializations
   flavortext: >
-    lorem ipsum sit amet dolor consectetur.  Weren't you listening earlier?
+    All warcasters can control warjacks, but how they use them varies greatly
+    from one caster to another.  Some are great warriors in their own right and see
+    their 'jacks merely as support pieces, some dedicate themselves to controlling
+    their 'jacks as efficiently and effectively as they can, and others use their 'jacks
+    to keep them safe while they stand in the back and provide magical support.
 archetypes:
   front line specialist:
     flavortext: >
@@ -167,19 +197,21 @@ archetypes:
         level: 11
         description: >
           Beginning at #{ordinal} level, when you use your action to make
-          the Attack action, you can make one additional attack as a bonus
-          action.  Additionally, you can ignore the Loading property on
+          the Attack action or cast a spell, you can have your 'jack make one
+          weapon attack, or use the Dash or Help action, as a bonus action. 
+          Additionally, you can ignore the Loading property on
           any magical or mechanikal ranged weapon you are using.
       - name: Improved Integration
         level: 15
         description: >
-          Starting at #{ordinal} level, when you use your action to cast a
-          spell, you can make one weapon attack as a bonus action.
+          Starting at #{ordinal} level, when you use your action to make the
+          Attack action, as a bonus action you may either make a weapon
+            attack or cast a cantrip or 1st-level spell..
   jack specialist:
-    flavortext: >
+    flavortext: > 
       A 'jack warcaster specializes in controlling and augmenting
-      their warjack, and can even learn to divide their attention
-      between multiple 'jacks.
+      their warjack, and can even learn to divide their attention between
+      multiple 'jacks.
     features:
       - name: Additional Proficiency
         level: 3
@@ -189,18 +221,17 @@ archetypes:
         level: 7
         description: >
           Starting at #{ordinal} level, you can control two 'jacks at once.
-          On turns when you order one
-          'jack to take the Dash, Disengage, Dodge, or Help action, you
-          can use a bonus action to command the other 'jack to take the
-          Dash, Disengage, Dodge, or Help action.  You do not have to
-          order them both to take the same action.
-      - name: TBD
+          On turns when you do not order either 'jack to attack, you 
+          can use a bonus action to command a 'jack to take the
+          Dash, Disengage, Dodge, or Help action.  If you command both
+          jacks, you do not have to order them both to take the same action.
+      - name: Tactical Control
         level: 11
         description: >
           Beginning at #{ordinal} level, when you order a 'jack to use the
           Attack action, it can make two attacks.  These can be with the
           same weapon or with two different weapons.  Alternatively, you
-          can choose to have each jack make one attack.  
+          can choose to have each 'jack make one attack.  
           Additionally, if you command one 'jack to use the Attack action
           but not the other, you can use a bonus action to command the
           non-attacking jack to use the Dash, Disengage, Dodge, or Help
@@ -221,8 +252,8 @@ archetypes:
         level: 3
         description: >
           You learn one additional cantrip.  You also learn one additional
-          cantrip when your proficiency bonus increases to 4, and one
-          additional cantrip when your proficiency bonus increase to 5.
+          cantrip at Warcaster level 9, and one additional cantrip at
+          Warcaster level 13.
       - name: Afterthought
         level: 7
         description: >
@@ -233,7 +264,15 @@ archetypes:
         level: 11
         description: >
           Starting at #{ordinal} level, when you command your 'jack to use
-          the Attack action, you can cast a cantrip as a bonus action.
+          the Attack action, you can cast a cantrip as a bonus action.  
+          Additionally, you gain the ability to use a few higher level spells
+          from your chosen spell list.  Choose a 6th level spell.  You can cast
+          this spell once without expending a spell slot.  You must finish a
+          long rest before you can do so again.  
+          At higher levels, you gain additional spells of your choice that can
+          be cast this way: one 7th-level spell at 13th level, one 8th-level
+          spell at 15th level, and one 9th-level spell at 17th level.  You regain
+          all uses of this ability when you finish a long rest.
       - name: Unit Support
         level: 15
         description: >
@@ -241,4 +280,5 @@ archetypes:
           you can also affect your 'jack with the spell if it is within 30 feet of
           you.  Additionally, you may affect allies within 30 feet with the
           spell, increasing the level of the spell slot used by one for each
-          such ally affected.
+          such ally affected.  You cannot increase the level of a spell past
+          5th with this ability.

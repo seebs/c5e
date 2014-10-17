@@ -57,8 +57,8 @@ features:
   - name: aid and comfort
     level: 2
     description: >
-      When you reach #{oridnal} level, you can take the Help action
-      as a bonus action on each of your turns,
+      When you reach #{ordinal} level, you can take the Help action
+      as a bonus action on each of your turns.
   - name: use magic device
     level: 6
     description: >
@@ -104,12 +104,15 @@ flavortext: >
   "I don't have *time* to take you apart, so you're just going to have to
   start working *now*."
 
+
   A grime-covered human, barely large enough to be an adult, sits in her
   workshop, surrounded by parts which practically leap into her hands as she
   puts them together.
 
+
   A dwarf carefully chisels additional runes into a warjack, muttering about
   the stability of a magical field.
+
 
   Where there are mechanika or simpler machines to be maintained, there are
   probably engineers maintaining them. They spend their days elbow-deep in
