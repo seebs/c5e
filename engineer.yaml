@@ -1,67 +1,285 @@
 version: 0.1
-name: bodger
+name: engineer
 hitdie: d8
 features:
-  - name: percussive maintenance
+  - name: repair specialist
     level: 1
     description: >
-      Starting at #{ordinal} level, a bodger can whack things until
-      they start working. When making a melee attack on a construct, you
-      can choose to subtract your Dexterity modifier from your damage
-      instead of adding it. When you do so, if the damage total would
-      be negative, it acts as healing of the same magnitude. If your
-      weapon is magical, its damage bonus is suppressed when using this
-      power.
-  - name: concussive maintenance
+      Starting at #{ordinal} level, you can repair mechanika, machines,
+      and warjacks. You get a pool of repair dice, equal to 1d8 per engineer
+      level. These dice can be used to repair machines, mechanika, and
+      warjacks during a short rest. During a long rest, you regain repair
+      dice equal to half your pool (minimum 1), but can't have more than
+      your total pool.
+  - name: tool use
+    level: 1
+    description: >
+      Starting at #{ordinal} level, you are proficient in the use of
+      mechanik's tools as weapons.  You can use Dexterity instead of
+      Strength for attack and damage rolls with tools.
+  - name: extra attack
+    level: 5
+    description: >
+      At #{ordinal} level, you can make two attacks when you take the Attack
+      action on your turn.
+  - name: focused expertise
+    level: 5
+    description: >
+      By #{ordinal} level, your mastery of skills and tools produces exceptional
+      results. If your proficiency modifier would apply to a check both because
+      of the tools used and because of the skill used, your proficiency bonus is
+      doubled for that check.
+  - name: technical jargon
     level: 2
     description: >
-      Fancy descriptive text
-      goes here.
-casting: half
+      By #{ordinal} level, you have learned the dense technical jargon used
+      by engineers to communicate. When talking with any engineer with whom
+      you share a language, you can exchange information about constructs
+      and mechanikal devices in half the time it would take to communicate
+      such things normally. This is impenetrable jargon to anyone who has
+      not learned it, either from training as an engineer or by adding it
+      as a known language.
+  - name: engineering school
+    level: 3
+    description: >
+      When you reach #{ordinal} level, you select an engineering school
+      reflecting your focus and specialization within the field. This
+      grants you additional class features at 3rd, 7th, 11th, 15th,
+      and 20th levels.
+  - name: engineering school feature
+    level: 7
+  - name: engineering school feature
+    level: 11
+  - name: engineering school feature
+    level: 15
+  - name: engineering school feature
+    level: 20
+  - name: aid and comfort
+    level: 2
+    description: >
+      When you reach #{oridnal} level, you can take the Help action
+      as a bonus action on each of your turns,
+  - name: use magic device
+    level: 6
+    description: >
+      Engineers are skilled in the use and maintenance of magical and
+      mechanikal devices, and can use them regardless of restrictions on
+      class or race beginning at #{ordinal} level.
+  - name: magical mending
+    level: 8
+    description: >
+      At #{ordinal} level you learn the _mending_ cantrip if you do not
+      already know it. This does not count against your spells known for any
+      class.
+  - name: improved repair
+    level: 9
+    description: >
+      Beginning at #{ordinal} level, when you use dice from your repair
+      pool during a short rest, you add your proficiency bonus to each die
+      to determine total healing.
+  - name: mechanikal expertise
+    level: 10
+    description: >
+      Starting at #{ordinal} level, when making any skill or ability
+      check to identify, understand, repair, or disable a construct,
+      trap, or mechanikal device, you treat any roll of 9 or lower
+      as a 10.
+casting: none
 proficiency_armor: light armor
-proficiency_weapons: simple weapons
-proficiency_tools: wrench
+proficiency_weapons: simple weapons, mechanik's tools
+proficiency_tools: mechanik's tools
 proficiency_saves: dexterity, intelligence
 proficiency_skills: [three, athletics, sleight of hand, arcana, deception, intimidation, investigation]
 creating_a: >
-  Your bodger shall be constructed from only the finest explosions and
-  spare rivets.
+  Engineers are specialists in the creation and maintenance of machines,
+  including mechanika.
 quick_build: [dexterity, intelligence, tinker]
+extra_features:
+  repair pool: [1d8, 2d8, 3d8, 4d8, 5d8, 6d8, 7d8, 8d8, 9d8, 10d8, 11d8, 12d8, 13d8, 14d8, 15d8, 16d8, 17d8, 18d8, 19d8, 20d8]
 equipment:
-  - item the first
-  - item the second
-  - [three, four]
-  -
-    - five
-    - six
+  - mechanik's tools
+  - leather armor
 flavortext: >
-  The bodger is good at whacking things until they work. Possibly with a hammer.
-  
-  ### Field Maintenance
+  A gobber stands behind a warjack, whacking it with a wrench and yelling
+  "I don't have *time* to take you apart, so you're just going to have to
+  start working *now*."
 
-  The bodger's specialty is getting it to work, now. It might not work again
-  tomorrow, it might not work as well as it used to, but when you need it
-  working within five minutes, the bodger is your best bet.
+  A grime-covered human, barely large enough to be an adult, sits in her
+  workshop, surrounded by parts which practically leap into her hands as she
+  puts them together.
+
+  A dwarf carefully chisels additional runes into a warjack, muttering about
+  the stability of a magical field.
+
+  Where there are mechanika or simpler machines to be maintained, there are
+  probably engineers maintaining them. They spend their days elbow-deep in
+  machinery, and are united in a passionate love for getting machines to
+  do things, regardless of their preferred approach.
 archetype_meta:
-  singular: bodger school
-  plural: bodger schools
+  singular: engineer school
+  plural: engineer schools
   flavortext: >
-    While bodgers start out as undisciplined tinkers, with time they develop
-    a more philosophical approach to their work, resulting in adhering to one
-    of the bodger schools of thought about machine maintenance. The school is
-    selected at 3rd level.
+    While engineers generally start out as casual tinkers, with time they
+    develop a more philosophical approach to their work, adhering to one
+    of the engineering schools of thought about machine maintenance. The
+    school is selected at 3rd level.
 archetypes:
   school of hard knocks:
     flavortext: >
-      The school of hard knocks teaches that the key virtue of percussive
-      maintenance is to hit something hard enough that it starts working
-      immediately.
+      The school of hard knocks focuses on immediate maintenance, with a
+      specialty of whacking things until they start working. Mechanika not
+      working yet? You probably need a bigger hammer, or a bigger bodger.
+      The bodger's specialty is getting it to work, now. It might not work
+      again tomorrow, it might not work as well as it used to, but when you
+      need it working within five minutes, the bodger is your best bet.
     features:
-      - name: whack it harder
+      - name: percussive maintenance
         level: 3
         description: >
-          At #{ordinal} level, an initiate of the school of hard knocks rerolls
-          any 1s on damage dice when using percussive maintenance.
-extra_features:
-  kitty: [1, 2, 3]
-  sad kitty: [-, -, -]
+          Starting at #{ordinal} level, a bodger can whack things until
+          they start working. As an action, you can make a melee attack on a
+          construct, mechanika, or warjack with any tool. If the attack hits,
+          you subtract (instead of adding) your Dexterity modifier from the
+          damage total, and also subtract your proficiency bonus from the damage
+          total. If the damage total becomes negative, it acts as healing.
+          If your weapon is magical, its bonus is subtracted from damage when
+          using this power.
+      - name: field repair
+        level: 7
+        description: >
+          At #{ordinal} level, you can use one die from your repair pool
+          when using the Percussive Maintenance ability. This healing applies
+          even if the attack misses.
+      - name: rapid percussion
+        level: 11
+        description: >
+          Beginning at #{ordinal} level, you can use the Percussive Maintenance
+          ability as a bonus action on your turn.
+      - name: upside the head
+        level: 15
+        description: >
+          At #{ordinal} level, you have learned to whack creatures upside
+          the head to clear or muddy their senses.  As an action, you can
+          make a melee attack against a creature with any tool. If the
+          attack hits, it deals no damage, but you can choose to give the
+          creature advantage, or disadvantage, on all Intelligence, Wisdom,
+          and Charisma saving throws and ability checks for one minute. If
+          you give the creature advantage on these saving throws, and it is
+          affected by any ongoing effect which could be ended by such a
+          saving throw, it can use its reaction make a saving throw to end
+          the effect. If it is affected by more than one such effect, it
+          can choose which one to try to end.
+  school of arcana:
+    flavortext: >
+      The school of arcana focuses more specifically on the hybrid of magic
+      and mechanical function, and students of this school are called arcane
+      mechaniks.
+    features:
+      - name: mechanikal attunement
+        level: 3
+        description: >
+          Starting at #{ordinal} level, you can maintain attunements for
+          mechanika, allowing yourself or other people to use them. When
+          you take a long rest, you pick a number of mechanika up to your
+          proficiency bonus. These mechanika are considered "charged" for
+          24 hours, and function as attuned for any wielder during that time.
+          These attunements do not count towards your personal limit of three
+          attuned magic items.
+      - name: fast attunement
+        level: 7
+        description: >
+          Beginning at #{ordinal} level, you can charge one mechanikal
+          device during a short rest, making it effectively "attuned" for any
+          user until your next long rest. You must complete a long rest before
+          you can use this feature again. This usage is still subject to your
+          normal limit on providing charges for mechanikal devices.
+      - name: temporary attunement
+        level: 11
+        description: >
+          Beginning at #{ordinal} level, you can attune items temporarily.
+          As an action, you can charge one mechanikal device, allowing
+          yourself or anyone else to use it as though it were attuned. This
+          attunement lasts for one minute. You must complete a short rest
+          before using this power again.
+      - name: lasting attunement
+        level: 15
+        description: >
+          At #{ordinal} level, your ability to charge mechanikal items has
+          improved and no longer requires constant reapplication.
+          While you live, items you have charged remain charged without the
+          need for daily reattunement. During a long rest, you can pick new
+          items to attune, and items you do not wish to continue maintaining
+          lose their attunement.
+      - name: personal attunement
+        level: 20
+        description: >
+          At #{ordinal} level, any item you personally wield in your hands
+          is considered attuned to you while you wield it. This does not
+          count against any limits on attuned items.
+  school of design:
+    flavortext: >
+      Students of the school of design are focused on the development of
+      new devices, but have significant ability to maintain and alter devices
+      already built by others. To pursue this research, they develop the
+      ability to run "prototypes", which function like mechanika, but do not
+      need normal attunement. However, they will not function for anyone
+      but their creator.
+    features:
+      - name: functional prototype
+        level: 3
+        description: >
+          When you select this school at #{ordinal} level, you gain the
+          ability to maintain mechanika of your own design. Your first
+          project is a functional prototype which is effectively a
+          mechanikal familiar. You learn the _find familiar_ spell and can
+          cast it as a ritual. The spell doesn't count against any limits
+          on spells known.  Your familiar, which is called your "functional
+          prototype", may take one of the normal forms, or one of the
+          following special forms: imp, pseudodragon, quasit, sprite.
+
+          However, your functional prototype differs from the standard
+          familiars in that whatever form it takes, it is actually a
+          construct (rather than a beast, celestial, fey, or fiend). If
+          your functional protoytype is reduced to zero hit points, it is
+          destroyed, and you must remake it (by casting the spell again.)
+
+          Your functional prototype's hit point maximum equals its
+          normal maximum or three times your engineer level, whichever is
+          higher.
+      - name: enhanced prototype
+        level: 7
+        description: >
+          At #{ordinal} level, you have learned to add functionality to your
+          prototype. During a long rest, you can attune a mechanikal device to
+          your functional prototype. The device then functions normally as an
+          attuned item for either you or your functional prototype, but does
+          not count against your normal limit of attuned items. However,
+          if your functional prototype is destroyed, the item also ceases to
+          be attuned.
+      - name: combat prototype
+        level: 11
+        description: >
+          Starting at #{ordinal} level, your functional prototype gains your
+          proficiency bonus to attack rolls, armor class, and all saving throws.
+          Also, your functional prototype can take the Attack action.
+      - name: advanced prototype
+        level: 15
+        description: >
+          Beginning at #{ordinal} level, when your functional prototype is
+          damaged but has any hit points remaining, it regains five hit
+          points on each of its turns. If it is reduced to zero hit points,
+          your functional prototype is not immediately destroyed.  Instead,
+          it is incapacitated. As an action, if you are within five feet of
+          it, you can restore it to one hit point. If it remains
+          incapacitated for a minute, it is destroyed. Also, you can now
+          keep two mechanikal devices attuned to your functional prototype.
+      - name: prototype reserve
+        level: 20
+        description: >
+          When you reach #{ordinal} level, you can maintain additional
+          prototypes in reserve, ready to be activated as needed. As an action,
+          you can cast _find familiar_ to replace your existing
+          prototype. The replacement can start out attuned to up to two
+          mechanikal devices. You must finish a short rest before using this
+          feature again.
+
