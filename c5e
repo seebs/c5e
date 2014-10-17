@@ -434,7 +434,7 @@ class Struct::ClassSpec
     slots = @@casting[casting][:slots]
     if max_level > 0 and slots[level] then
       s = slots[level]
-      1.upto(max_level).map do |l|
+      (0...max_level).map do |l|
         if s[l] then
 	  "<td class='c'>#{s[l]}</td>"
 	else
