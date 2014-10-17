@@ -30,6 +30,8 @@ Top-level: scalars to scalars, in general
 	  These don't get listed under Class Features in general.
 	  For something like sneak attack, have a general features entry
 	  at 1st level, and then an extra_features column.
+	extra_features_after:
+	  Same as extra_features, but listed after the main Features column.
 	flavortext: Introductory flavortext.
 	creating_a: Flavortext for character creation
 	quick_build: [ability, ability, background]

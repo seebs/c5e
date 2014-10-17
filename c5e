@@ -24,21 +24,24 @@ html
       tr
         th
 	th Proficiency
+	== feature_headers_before(true)
 	th 
-	== feature_headers(true)
+	== feature_headers_after(true)
 	== casting_headers(true)
       tr
         th Level
 	th Bonus
+	== feature_headers_before(false)
 	th Features
-	== feature_headers(false)
+	== feature_headers_after(false)
 	== casting_headers(false)
       - for level in (1..20)
         tr
           td.c =level.ordinalize
 	  td.c ="+#{proficiency(level)}"
+	  == feature_body_before(level - 1)
 	  td =features_by_level[level].join(", ")
-	  == feature_body(level - 1)
+	  == feature_body_after(level - 1)
 	  == casting_body(level - 1)
     .content
       h2 Class Features
@@ -54,31 +57,31 @@ html
         **Weapons:** #{proficiency_weapons.capitalize}  
         **Tools:** #{proficiency_tools.capitalize}  
 	  
-	**Saving Throws:** #{full_capitalize(proficiency_saves)}  
-	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map {|x| full_capitalize(x) }.join(", ")}
+	**Saving Throws:** #{proficiency_saves.titleize}  
+	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map(&:titleize).join(", ")}
 
       h4 Equipment
-      p Sample stuff.
+      p You start with the following equipment, in addition to the equipment granted by your background:
       ul
         - for item in equipment
           li == markdown(item)
 	   
       - for level in (1..20)
         - for feature in features_by_level[level]
-	  - if !already_displayed[feature]
+	  - if !already_displayed[feature] && features_by_name[feature]
 	    - already_displayed[feature] = true
 	    h3 =feature
-	    markdown:
-	      #{features_by_name[feature]}
+	    == markdown(features_by_name[feature])
 	 
-      h2 #{full_capitalize(archetype_meta.plural)}
+      h2 #{archetype_meta.plural.titleize}
       == markdown(archetype_meta.flavortext)
       - archetypes.each_pair do |name, details|
-        h3 =name
+        h3 =name.to_s.titleize
 	== markdown(details.flavortext)
 	- for feature in details.features
-	  h4 = feature.name
-	  p == markdown(feature.description)
+	  - if feature.description
+	    h4 = feature.name
+	    p == markdown(feature.description)
 EOF
 
 default_css_data = <<'EOF'
@@ -193,6 +196,7 @@ require 'optparse'
 require 'ostruct'
 require 'redcarpet'
 require 'active_support/core_ext/integer/inflections'
+require 'titleize'
 
 Slim::Engine.set_default_options pretty: true, sort_attrs: false, tabsize: 8
 
@@ -235,6 +239,7 @@ fields = %i(
   casting
   features
   extra_features
+  extra_features_after
   proficiency_armor
   proficiency_weapons
   proficiency_skills
@@ -249,7 +254,6 @@ fields = %i(
   css
 )
 
-ClassSpec = Struct.new(*fields)
 
 def deepstruct(obj)
   if obj.respond_to? :each_index
@@ -270,65 +274,11 @@ def deepstruct(obj)
   obj
 end
 
-class ClassSpec
-  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details)
+Struct.new("ClassSpec", *fields)
+
+class Struct::ClassSpec
+  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details extra_names_after extra_details_after)
   @@internal_members.each do |m| attr_accessor m end
-
-  def initialize(filename, hash)
-    @filename = filename
-    @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
-    missing = []
-    extra = []
-    # convert everything to allow dots.
-    members.each do |m|
-      obj = hash[m] || hash[m.to_s]
-      hash.delete(m)
-      hash.delete(m.to_s)
-      if obj then
-        send("#{m}=", deepstruct(obj))
-      else
-	# Special case: We don't want to make you indicate the default.
-        missing << m unless m == :abilityincreases
-      end
-    end
-    @@internal_members.each do |m|
-      self.send("#{m}=", hash[m] || hash[m.to_s])
-      hash.delete(m)
-      hash.delete(m.to_s)
-    end
-    hash.each do |k,v|
-      extra << k
-    end
-    if !missing.empty?
-      note "Missing fields: #{missing.join(', ')}"
-    end
-    if !extra.empty?
-      note "Extra fields: #{extra.join(', ')}"
-    end
-  end
-
-  def fatal(message)
-    note "Fatal error in '#{@filename}': #{message}"
-    @failed = true
-  end
-
-  def set_default(name, value)
-    if !send(name)
-      send(name + "=", value)
-    end
-  end
-
-  def proficiency(n)
-    ((n+7)/4).floor
-  end
-
-  def markdown(text)
-    @markdown.render(text)
-  end
-
-  def full_capitalize(str)
-    str.split.map(&:capitalize).join(' ')
-  end
 
   @@casting = {
     nil => {
@@ -412,6 +362,58 @@ class ClassSpec
     },
   }
 
+  def initialize(filename, hash)
+    @filename = filename
+    @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
+    missing = []
+    extra = []
+    # convert everything to allow dots.
+    members.each do |m|
+      obj = hash[m] || hash[m.to_s]
+      hash.delete(m)
+      hash.delete(m.to_s)
+      if obj then
+        send("#{m}=", deepstruct(obj))
+      else
+	# Special case: We don't want to make you indicate the default.
+        missing << m unless m == :abilityincreases
+      end
+    end
+    @@internal_members.each do |m|
+      self.send("#{m}=", hash[m] || hash[m.to_s])
+      hash.delete(m)
+      hash.delete(m.to_s)
+    end
+    hash.each do |k,v|
+      extra << k
+    end
+    if !missing.empty?
+      note "Missing fields: #{missing.join(', ')}"
+    end
+    if !extra.empty?
+      note "Extra fields: #{extra.join(', ')}"
+    end
+  end
+
+  def fatal(message)
+    note "Fatal error in '#{@filename}': #{message}"
+    @failed = true
+  end
+
+  def set_default(name, value)
+    if !send(name)
+      send(name + "=", value)
+    end
+  end
+
+  def proficiency(n)
+    ((n+7)/4).floor
+  end
+
+  def markdown(text)
+    @markdown.render(text)
+  end
+
   def casting_headers(top)
     max_level = @@casting[casting][:max_level]
     if max_level > 0 then
@@ -444,7 +446,7 @@ class ClassSpec
     end
   end
 
-  def feature_headers(top)
+  def feature_headers_before(top)
     if top then
       index = 0
     else
@@ -455,17 +457,36 @@ class ClassSpec
     end.join("\n")
   end
 
-  def feature_body(level)
+  def feature_headers_after(top)
+    if top then
+      index = 0
+    else
+      index = 1
+    end
+    extra_names_after.map do |name|
+      "<th>#{name[index]}</th>"
+    end.join("\n")
+  end
+
+  def feature_body_before(level)
     extra_details.map do |d|
+      "<td class='c'>#{d[level] || "&mdash;"}</td>"
+    end.join("\n")
+  end
+
+  def feature_body_after(level)
+    extra_details_after.map do |d|
       "<td class='c'>#{d[level] || "&mdash;"}</td>"
     end.join("\n")
   end
 
   def feature_cleanup(f)
     f.level = f.level.to_i
-    f.name = full_capitalize(f.name)
+    f.name = f.name.titleize
     f.ordinal = f.level.ordinalize
-    f.description.gsub!('#{ordinal}', f.ordinal)
+    if f.description
+      f.description.gsub!('#{ordinal}', f.ordinal)
+    end
   end
 
   def sanity
@@ -523,21 +544,42 @@ EOF
       self.casting = nil
     end
     archetypes.each_pair do |name, a|
-      a.features.each do |f|
-        feature_cleanup(f)
+      if a.features then
+        a.features.each do |f|
+          feature_cleanup(f)
+        end
+      else
+        note "Warning: Archetype '#{name}' has no features."
+	a.features = []
       end
     end
     self.extra_names = []
     self.extra_details = []
-    extra_features.each_pair do |name, tab|
-      words = full_capitalize(name.to_s).split
-      # split into two lines
-      if words.count > 1 then
-        extra_names << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
-      else
-        extra_names << ["", words[0]]
+    self.extra_names_after = []
+    self.extra_details_after = []
+    if extra_features
+      extra_features.each_pair do |name, tab|
+	words = name.to_s.titleize.split
+	# split into two lines
+	if words.count > 1 then
+	  extra_names << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
+	else
+	  extra_names << ["", words[0]]
+	end
+	extra_details << tab
       end
-      extra_details << tab
+    end
+    if extra_features_after
+      extra_features_after.each_pair do |name, tab|
+	words = name.to_s.titleize.split
+	# split into two lines
+	if words.count > 1 then
+	  extra_names_after << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
+	else
+	  extra_names_after << ["", words[0]]
+	end
+	extra_details_after << tab
+      end
     end
     equipment.each_index do |i|
       obj = equipment[i]
@@ -580,7 +622,7 @@ ARGV.each do |arg|
     if not data['css']
       data['css'] = default_css_data
     end
-    wrapped = ClassSpec.new(arg, data)
+    wrapped = Struct::ClassSpec.new(arg, data)
     if wrapped.sanity
       wrapped.prettyprint(slim_template)
     end
