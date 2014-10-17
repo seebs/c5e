@@ -411,7 +411,8 @@ class Struct::ClassSpec
   end
 
   def markdown(text)
-    @markdown.render(text)
+    # yaml helpfully turns blank lines into single line breaks.
+    @markdown.render(text.gsub("\n", "\n\n"))
   end
 
   def casting_headers(top)
@@ -498,6 +499,7 @@ class Struct::ClassSpec
       self.abilityincreases = [ 4, 8, 12, 16, 19 ]
     end
     abilityincreases.sort!
+    p flavortext
     if !hitdie
       fatal "You must specify hit die type (for example, 8 or d8)."
     else
