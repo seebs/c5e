@@ -1,88 +1,95 @@
 #!/usr/bin/ruby -w
 
 # The actual pretty-printing page:
-base_template = <<'EOF'
+html_template = <<'EOF'
 doctype html
 html
   head
     title = "The #{name.capitalize}"
     style type="text/css" == css
   body
-    .content
-      h2 The #{name.capitalize}
-      == markdown(flavortext)
-      h3 Creating a #{name.capitalize}
-      == markdown creating_a
-        #{creating_a}
-      h4 Quick Build
-      == markdown "To create a #{name}, put your best score in \
-	#{quick_build[0].capitalize}, your second-best in \
-	#{quick_build[1].capitalize}, and take the #{quick_build[2].capitalize} \
-	background. #{quick_build_extra || ""}"
-
-    table.classtable
-      tr
-        th
-	th Proficiency
-	== feature_headers_before(true)
-	th 
-	== feature_headers_after(true)
-	== casting_headers(true)
-      tr
-        th Level
-	th Bonus
-	== feature_headers_before(false)
-	th Features
-	== feature_headers_after(false)
-	== casting_headers(false)
-      - for level in (1..20)
-        tr
-          td.c =level.ordinalize
-	  td.c ="+#{proficiency(level)}"
-	  == feature_body_before(level - 1)
-	  td =features_by_level[level].join(", ")
-	  == feature_body_after(level - 1)
-	  == casting_body(level - 1)
-    .content
-      h2 Class Features
-      p As a #{name}, you gain the following class features.
-      h4 Hit Points
-      markdown:
-        **Hit Dice:** 1d#{hitdie} per #{name} level  
-        **Hit Points at 1st Level:** #{hitdie} + your Constitution modifier  
-        **Hit Points at Higher Levels:** 1d#{hitdie} (or #{hitdie_average}) + your Constitution modifier per #{name} level after 1st
-      h4 Proficiencies
-      markdown:
-        **Armor:** #{proficiency_armor.capitalize}  
-        **Weapons:** #{proficiency_weapons.capitalize}  
-        **Tools:** #{proficiency_tools.capitalize}  
-	<br/>
-	**Saving Throws:** #{proficiency_saves.titleize}  
-	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map(&:titleize).join(", ")}
-
-      h4 Equipment
-      p You start with the following equipment, in addition to the equipment granted by your background:
-      ul
-        - for item in equipment
-          li == markdown(item)
-	   
-      - for level in (1..20)
-        - for feature in features_by_level[level]
-	  - if !already_displayed[feature] && features_by_name[feature]
-	    - already_displayed[feature] = true
-	    h3 =feature
-	    == markdown(features_by_name[feature])
-	 
-      h2 #{archetype_meta.plural.titleize}
-      == markdown(archetype_meta.flavortext)
-      - archetypes.each_pair do |name, details|
-        h3 =name.to_s.titleize
-	== markdown(details.flavortext)
-	- for feature in details.features
-	  - if feature.description
-	    h4 = feature.name
-	    == markdown(feature.description)
+    == markdown(rendered_markdown)
 EOF
+
+require 'erb'
+
+md_template = ERB.new %q{
+## The <%= name.capitalize %>
+
+<%= flavortext %>
+
+### Creating <%= an %> <%= name.capitalize %>
+
+<%= creating_a %>
+
+#### Quick Build
+
+To create a <%= an %> <%= name.capitalize %>, put your best stat in
+<%= quick_build[0].capitalize %>, your second-best in
+<%= quick_build[1].capitalize %>, and take the <%= quick_build[2].capitalize %>
+background. <%= quick_build_extra || "" %>
+
+|<br/>Level|Proficiency<br/>Bonus|<%= feature_headers_before(false) %>Features|<%= feature_headers_after(false) %><%= casting_headers(false) %>
+|:-:|:-:|<%= feature_headers_before(true) %>:--|<%= feature_headers_after(true) %><%= casting_headers(true) %>
+<% (1..20).each do |level| %><%= level.ordinalize %>|+<%= proficiency(level) %>|<%= feature_body_before(level - 1) %><%= features_by_level[level].join(", ") %>|<%= feature_body_after(level - 1) %><%= casting_body(level - 1) %>
+<% end %>
+
+## Class Features
+
+As <%= an %> <%= name %>, you gain the following class features.
+
+#### Hit Points
+
+**Hit Dice:** 1d<%= hitdie %> per <%= name %> level  
+**Hit Points at 1st Level:** <%= hitdie %> + your Constitution modifier  
+**Hit Points at Higher Levels:** 1d<%= hitdie %> (or <%= hitdie_average %>) + your Constitution modifier per <%= name %> level after 1st
+
+#### Proficiencies
+
+**Armor:** <%= proficiency_armor.capitalize %>  
+**Weapons:** <%= proficiency_weapons.capitalize %>  
+**Tools:** <%= proficiency_tools.capitalize %>  
+<br/>
+**Saving Throws:** <%= proficiency_saves.titleize %>  
+**Skills:** Choose <%= proficiency_skills_choose %> from <%= proficiency_skills_list.map(&:titleize).join(", ") %>
+
+#### Equipment
+
+You start with the following equipment, in addition to the equipment granted by your background:
+
+<% equipment.each do |item| %>
+* <%= item %>
+<% end %>
+
+<% (1..20).each do |level| %>
+<% features_by_level[level].each do |feature| %>
+<% if !already_displayed[feature] && features_by_name[feature] %>
+<% already_displayed[feature] = true %>
+### <%= feature %>
+
+<%= features_by_name[feature] %>
+
+<% end %>
+<% end %>
+<% end %>
+
+## <%= archetype_meta.plural.titleize %>
+
+<%= archetype_meta.flavortext %>
+
+<% archetypes.each_pair do |name, details| %>
+### <%= name.to_s.titleize %>
+
+<% details.features.each do |feature| %>
+<% if feature.description %>
+#### <%= feature.name %>
+
+<%= feature.description %>
+
+<% end %>
+<% end %>
+<% end %>
+}
 
 default_css_data = <<'EOF'
 body {
@@ -153,23 +160,23 @@ a:visited {
     color:  #500090;
 }
 
-table.classtable {
+table {
   min-width: 50%;
   border-collapse: collapse;
 }
 
-table.classtable tr td, th {
+table tr td, th {
   border-color: inherit;
   border-style: none solid;
   padding: 1pt 5pt;
 }
 
-table.classtable tr:nth-child(2n+1) {
+table tr:nth-child(2n+1) {
   background-color: #cccccc;
   border-color: #cccccc;
 }
 
-table.classtable tr:nth-child(1), tr:nth-child(2), tr:nth-child(2n) {
+table tr:nth-child(1), tr:nth-child(2), tr:nth-child(2n) {
   background-color: #ffffff;
   border-color: #ffffff;
 }
@@ -211,13 +218,19 @@ end
 options = {}
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: c5e [-c css] classname"
+  opts.banner = "Usage: c5e [-mh] [-c css] classname"
   opts.on("-cMANDATORY", String, "select css file") do |v|
     options[:css] = v
   end
+  opts.on("-h", String, "render to html") { options[:html] = true }
+  opts.on("-m", String, "render to markdown") { options[:markdown] = true }
 end.parse!
 
-slim_template = Slim::Template.new { base_template }
+if !options[:html] && !options[:markdown]
+  options[:html] = true
+end
+
+slim_template = Slim::Template.new { html_template }
 
 if options[:css] then
   default_css_data = begin
@@ -259,21 +272,18 @@ fields = %i(
   css
 )
 
-def deepstruct(obj)
+def fancy_cleanup(obj)
   if obj.respond_to? :each_index
     obj.each_index do |k|
-      v = obj[k]
-      if v.respond_to? :each then
-        obj[k] = deepstruct(v)
-      end
+      obj[k] = fancy_cleanup(obj[k])
     end
   elsif obj.respond_to? :each_pair
     obj.each_pair do |k,v|
-      if v.respond_to? :each then
-        obj[k] = deepstruct(v)
-      end
+      obj[k] = fancy_cleanup(v)
     end
     obj = OpenStruct.new(obj)
+  elsif obj.respond_to? :gsub
+    obj = obj.gsub("\n", "\n\n")
   end
   obj
 end
@@ -281,13 +291,14 @@ end
 Struct.new("ClassSpec", *fields)
 
 class Struct::ClassSpec
-  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details extra_names_after extra_details_after)
+  @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details extra_names_after extra_details_after rendered_markdown)
   @@internal_members.each do |m| attr_accessor m end
   @@optional_fields = {
     :abilityincreases => true,
     :extra_features => true,
     :extra_features_after => true,
     :quick_build_extra => true,
+    :css => true,
   }
 
   @@casting = {
@@ -372,9 +383,9 @@ class Struct::ClassSpec
     },
   }
 
-  def initialize(filename, hash)
+  def initialize(filename, hash, css)
     @filename = filename
-    @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, {})
+    @markdown = Redcarpet::Markdown.new(Redcarpet::Render::XHTML, { :tables => true })
     missing = []
     extra = []
     # convert everything to allow dots.
@@ -383,11 +394,14 @@ class Struct::ClassSpec
       hash.delete(m)
       hash.delete(m.to_s)
       if obj then
-        send("#{m}=", deepstruct(obj))
+        send("#{m}=", fancy_cleanup(obj))
       else
 	# Special case: We don't want to make you indicate the default.
         missing << m unless @@optional_fields[m]
       end
+    end
+    if !self.css
+      self.css = css
     end
     @@internal_members.each do |m|
       self.send("#{m}=", hash[m] || hash[m.to_s])
@@ -402,6 +416,13 @@ class Struct::ClassSpec
     end
     if !extra.empty?
       note "Extra fields: #{extra.join(', ')}"
+    end
+  end
+
+  def an
+    case name
+    when /^[aeiou]/i; "an"
+    else "a"
     end
   end
 
@@ -421,20 +442,17 @@ class Struct::ClassSpec
   end
 
   def markdown(text)
-    # yaml helpfully turns blank lines into single line breaks.
-    @markdown.render(text.gsub("\n", "\n\n"))
+    @markdown.render text
   end
 
-  def casting_headers(top)
+  def casting_headers(dashes)
     max_level = @@casting[casting][:max_level]
     if max_level > 0 then
-      if top then
-        return "<th colspan=#{max_level}>&mdash;Spell Slots per Spell Level&mdash;</th>\n"
+      if dashes then
+	(1..max_level).map do |l| ":-:|" end
       else
-	(1..max_level).map do |l|
-	  "<th>#{l.ordinalize}</th>"
-	end.join("\n")
-      end
+	(1..max_level).map do |l| "#{l.ordinalize}|" end
+      end.join("")
     else
       ""
     end
@@ -447,48 +465,42 @@ class Struct::ClassSpec
       s = slots[level]
       (0...max_level).map do |l|
         if s[l] then
-	  "<td class='c'>#{s[l]}</td>"
+	  "#{s[l]}|"
 	else
-	  "<td class='c'>&mdash;</td>"
+	  "---|"
 	end
-      end.join("\n")
+      end.join("")
     else
       ""
     end
   end
 
-  def feature_headers_before(top)
-    if top then
-      index = 0
+  def feature_headers_before(dashes)
+    if dashes
+      extra_names.map { |name| ":-:|" }.join("")
     else
-      index = 1
+      extra_names.map { |name| "#{name}|" }.join("")
     end
-    extra_names.map do |name|
-      "<th>#{name[index]}</th>"
-    end.join("\n")
   end
 
-  def feature_headers_after(top)
-    if top then
-      index = 0
+  def feature_headers_after(dashes)
+    if dashes
+      extra_names_after.map { |name| ":-:|" }.join("")
     else
-      index = 1
+      extra_names_after.map { |name| "#{name}|" }.join("")
     end
-    extra_names_after.map do |name|
-      "<th>#{name[index]}</th>"
-    end.join("\n")
   end
 
   def feature_body_before(level)
     extra_details.map do |d|
-      "<td class='c'>#{d[level] || "&mdash;"}</td>"
-    end.join("\n")
+      "#{d[level] || "&mdash;"}|"
+    end.join("")
   end
 
   def feature_body_after(level)
     extra_details_after.map do |d|
-      "<td class='c'>#{d[level] || "&mdash;"}</td>"
-    end.join("\n")
+      "#{d[level] || "&mdash;"}|"
+    end.join("")
   end
 
   def feature_cleanup(f)
@@ -573,9 +585,9 @@ EOF
 	words = name.to_s.titleize.split
 	# split into two lines
 	if words.count > 1 then
-	  extra_names << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
-	else
-	  extra_names << ["", words[0]]
+	  extra_names << "#{words[0...words.count/2].join(" ")}<br/>#{words[words.count/2..-1].join(" ")}"
+        else
+	  extra_names << words[0]
 	end
 	extra_details << tab
       end
@@ -585,9 +597,9 @@ EOF
 	words = name.to_s.titleize.split
 	# split into two lines
 	if words.count > 1 then
-	  extra_names_after << [words[0...words.count/2].join(" "), words[words.count/2..-1].join(" ")]
-	else
-	  extra_names_after << ["", words[0]]
+	  extra_names_after << "#{words[0...words.count/2].join(" ")}<br/>#{words[words.count/2..-1].join(" ")}"
+        else
+	  extra_names_after << words[0]
 	end
 	extra_details_after << tab
       end
@@ -607,15 +619,24 @@ EOF
     !@failed
   end
 
-  def prettyprint(template)
+  def get_binding
+    binding
+  end
+
+  def prettyprint(md_template, slim_template, options)
     note "Found data for #{name}"
-    htmlname = if @filename['.yaml'] then
-      @filename.sub('.yaml', '.html')
-    else
-      @filename + '.html'
+    basename = @filename.sub(/\.yaml$/, '')
+    htmlname = basename + '.html'
+    mdname = basename + '.md'
+
+    self.rendered_markdown = md_template.result(self.get_binding)
+    if options[:markdown] then
+      File.open(mdname, "w") do |f| f.puts(self.rendered_markdown) end
     end
-    @htmlfile = File.open(htmlname, "w")
-    @htmlfile.puts(template.render(self))
+    if options[:html] then
+      rendered_html = slim_template.render(self)
+      File.open(htmlname, "w") do |f| f.puts(rendered_html) end
+    end
   end
 end
 
@@ -630,12 +651,9 @@ ARGV.each do |arg|
   end
   data = YAML.load_file(arg)
   if data then
-    if not data['css']
-      data['css'] = default_css_data
-    end
-    wrapped = Struct::ClassSpec.new(arg, data)
+    wrapped = Struct::ClassSpec.new(arg, data, default_css_data)
     if wrapped.sanity
-      wrapped.prettyprint(slim_template)
+      wrapped.prettyprint(md_template, slim_template, options)
     end
   else
     note "Failed to load '#{arg}'."
