@@ -84,6 +84,22 @@ features:
       check to identify, understand, repair, or disable a construct,
       trap, or mechanikal device, you treat any roll of 9 or lower
       as a 10.
+  - name: tbd 13
+    level: 13
+    description: >
+      Need a description here.
+  - name: tbd 14
+    level: 14
+    description: >
+      Need a description here.
+  - name: tbd 17
+    level: 17
+    description: >
+      Need a description here.
+  - name: tbd 18
+    level: 18
+    description: >
+      Need a description here.
 casting: none
 proficiency_armor: light armor
 proficiency_weapons: simple weapons, mechanik's tools
@@ -102,17 +118,15 @@ equipment:
 flavortext: >
   A gobber stands behind a warjack, whacking it with a wrench and yelling
   "I don't have *time* to take you apart, so you're just going to have to
-  start working *now*."
-
+  start working *now*." He gives it a particularly solid blow with the
+  wrench, and its eyes light up.
 
   A grime-covered human, barely large enough to be an adult, sits in her
   workshop, surrounded by parts which practically leap into her hands as she
   puts them together.
 
-
   A dwarf carefully chisels additional runes into a warjack, muttering about
   the stability of a magical field.
-
 
   Where there are mechanika or simpler machines to be maintained, there are
   probably engineers maintaining them. They spend their days elbow-deep in
