@@ -56,7 +56,7 @@ html
         **Armor:** #{proficiency_armor.capitalize}  
         **Weapons:** #{proficiency_weapons.capitalize}  
         **Tools:** #{proficiency_tools.capitalize}  
-	  
+	<br/>
 	**Saving Throws:** #{proficiency_saves.titleize}  
 	**Skills:** Choose #{proficiency_skills_choose} from #{proficiency_skills_list.map(&:titleize).join(", ")}
 
@@ -81,7 +81,7 @@ html
 	- for feature in details.features
 	  - if feature.description
 	    h4 = feature.name
-	    p == markdown(feature.description)
+	    == markdown(feature.description)
 EOF
 
 default_css_data = <<'EOF'
@@ -95,6 +95,10 @@ body {
 p {
   margin-bottom: 0.1em;
   margin-top: 0.1em;
+}
+
+p+p {
+  text-indent: 1em;
 }
 
 h2, h3, h4 {
@@ -499,7 +503,6 @@ class Struct::ClassSpec
       self.abilityincreases = [ 4, 8, 12, 16, 19 ]
     end
     abilityincreases.sort!
-    p flavortext
     if !hitdie
       fatal "You must specify hit die type (for example, 8 or d8)."
     else
@@ -523,9 +526,9 @@ class Struct::ClassSpec
     last = abilityincreases[-1]
     rest = abilityincreases[1..-2]
     features_by_name['Ability Score Improvement'] = <<EOF
-When you reach #{first.ordinalize} level, and again at
-#{rest.map(&:ordinalize).join(", ")}, and #{last.ordinalize} level,
-you can increase one ability score by 2, or two ability scores by 1,
+When you reach #{first.ordinalize} level, and again at \
+#{rest.map(&:ordinalize).join(", ")}, and #{last.ordinalize} level, \
+you can increase one ability score by 2, or two ability scores by 1, \
 to a maximum of 20.
 EOF
     set_default('proficiency_skills', ["one", "basket-weaving", "exploding"])
