@@ -35,6 +35,7 @@ Top-level: scalars to scalars, in general
 	flavortext: Introductory flavortext.
 	creating_a: Flavortext for character creation
 	quick_build: [ability, ability, background]
+	quick_build_extra: Additional text such as spell selection.
 	archetype_meta:
           hash, containing "singular", "plural", and "flavortext".  "singular"
 	  and "plural" is where you'd put things like "roguish

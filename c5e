@@ -5,20 +5,20 @@ base_template = <<'EOF'
 doctype html
 html
   head
-    title = "#{name}"
+    title = "The #{name.capitalize}"
     style type="text/css" == css
   body
     .content
       h2 The #{name.capitalize}
       == markdown(flavortext)
       h3 Creating a #{name.capitalize}
-      markdown:
+      == markdown creating_a
         #{creating_a}
       h4 Quick Build
-      p To create a #{name}, put your best score in
-	#{quick_build[0].capitalize}, your second-best in
-	#{quick_build[1].capitalize}, and take the
-	#{quick_build[2].capitalize} background.
+      == markdown "To create a #{name}, put your best score in \
+	#{quick_build[0].capitalize}, your second-best in \
+	#{quick_build[1].capitalize}, and take the #{quick_build[2].capitalize} \
+	background. #{quick_build_extra || ""}"
 
     table.classtable
       tr
@@ -253,11 +253,11 @@ fields = %i(
   flavortext
   creating_a
   quick_build
+  quick_build_extra
   archetype_meta
   archetypes
   css
 )
-
 
 def deepstruct(obj)
   if obj.respond_to? :each_index
@@ -283,6 +283,12 @@ Struct.new("ClassSpec", *fields)
 class Struct::ClassSpec
   @@internal_members = %i(features_by_name features_by_level proficiency_skills_choose proficiency_skills_list hitdie_average already_displayed extra_names extra_details extra_names_after extra_details_after)
   @@internal_members.each do |m| attr_accessor m end
+  @@optional_fields = {
+    :abilityincreases => true,
+    :extra_features => true,
+    :extra_features_after => true,
+    :quick_build_extra => true,
+  }
 
   @@casting = {
     nil => {
@@ -380,7 +386,7 @@ class Struct::ClassSpec
         send("#{m}=", deepstruct(obj))
       else
 	# Special case: We don't want to make you indicate the default.
-        missing << m unless m == :abilityincreases
+        missing << m unless @@optional_fields[m]
       end
     end
     @@internal_members.each do |m|

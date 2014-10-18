@@ -138,7 +138,8 @@ proficiency_skills: [two, sleight of hand, arcana, investigation, religion, perc
 creating_a: >
   I don't want to start any blasphemous rumours, but I think that Thamar's got
   a sick sense of humour and when I die, I expect to find her laughing.
-quick_build: [intelligence, constitution, soldier, the wizard spell list and the _fire bolt_ and _mending_ cantrips]
+quick_build: [intelligence, constitution, soldier]
+quick_build_extra: Pick the wizard spell list and the _fire bolt_ and _mending_ cantrips.
 equipment:
   - scale mail or leather armor
   - simple melee weapon
